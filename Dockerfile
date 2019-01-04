@@ -29,7 +29,7 @@ FROM alpine
 LABEL application=todobackend
 
 #Install operating system depedencies
-RUN apk add --no-cache python3 mariadb-client bash
+RUN apk add --no-cache python3 mariadb-client bash curl bats jq
 
 #Create app user
 RUN addgroup -g 1000 app && adduser -u 1000 -G app -D app 
@@ -39,6 +39,11 @@ COPY --from=test --chown=app:app /build /build
 COPY --from=test --chown=app:app /app /app
 RUN pip3 install -r /build/requirements.txt -f /build --no-index --no-cache-dir
 RUN rm -rf /build
+
+# Create public volume
+RUN mkdir /public
+RUN chown app:app /public
+VOLUME /public
 
 # Set working directory and application user
 WORKDIR /app
